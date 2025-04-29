@@ -20,7 +20,7 @@ class Dealer(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='user')
     company_name = models.CharField(max_length=50)
     description = models.TextField()
-    logo = models.ImageField(upload_to='logo/', null=True, blank=True)
+    logo = models.ImageField(upload_to='company-logo/', null=True, blank=True)
     website = models.URLField()
     address = models.TextField()
     is_verified = models.BooleanField()
