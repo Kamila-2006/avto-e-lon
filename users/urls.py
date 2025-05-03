@@ -8,8 +8,8 @@ router = DefaultRouter()
 router.register(r'dealers', views.DealerViewSet, basename='dealers')
 
 urlpatterns = [
-    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('auth/register/', views.RegisterView.as_view(), name='auth_register'),
+    path('auth/login/', TokenObtainPairView.as_view(), name='user-login'),
+    path('auth/register/', views.RegisterView.as_view(), name='user-register'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('users/<int:pk>/', views.UserProfileView.as_view(), name='user-profile'),
     path('', include(router.urls)),
