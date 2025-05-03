@@ -3,9 +3,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
+from .permissions import IsDealerOwner
 from .models import Dealer
 from .serializers import RegisterSerializer, UserSerializer, DealerSerializer
 from .pagination import DealerPagination
@@ -45,3 +46,12 @@ class DealerViewSet(viewsets.ModelViewSet):
     serializer_class = DealerSerializer
     pagination_class = DealerPagination
     permission_classes = [IsAuthenticated]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        elif self.action == 'create':
+            return [IsAuthenticated()]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            return [IsAuthenticated(), IsDealerOwner()]
+        return [IsAuthenticated()]
