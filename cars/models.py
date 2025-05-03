@@ -58,6 +58,12 @@ class Car(BaseModel):
         ('other', 'Other'),
     ]
 
+    DRIVE_TYPE_CHOICES = [
+        ('front', 'Front'),
+        ('rear', 'Rear'),
+        ('all', 'All'),
+    ]
+
     make = models.ForeignKey(Make, on_delete=models.CASCADE, related_name='cars')
     model = models.ForeignKey(Model, on_delete=models.CASCADE, related_name='cars')
     year = models.PositiveIntegerField()
@@ -68,6 +74,6 @@ class Car(BaseModel):
     mileage = models.PositiveIntegerField()
     engine_size = models.FloatField()
     power = models.PositiveIntegerField()
-    drive_type = models.CharField(max_length=50)
+    drive_type = models.CharField(max_length=50, choices=DRIVE_TYPE_CHOICES)
     features = models.ManyToManyField(Feature, related_name='cars')
     vin = models.CharField(max_length=17, unique=True)

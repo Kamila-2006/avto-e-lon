@@ -17,3 +17,7 @@ class BodyTypeAdmin(admin.ModelAdmin):
 @admin.register(Feature)
 class FeatureAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'category')
+
+@admin.register(Car)
+class CarAdmin(admin.ModelAdmin):
+    list_display = ('id', 'make', 'model', 'year', 'body_type', 'fuel_type', 'transmission', 'color', 'mileage', 'engine_size', 'power', 'drive_type', 'vin')

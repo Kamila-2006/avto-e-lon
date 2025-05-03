@@ -1,8 +1,8 @@
 from rest_framework import generics, viewsets
 from rest_framework.permissions import AllowAny
 from .models import Car, Make, Model, Feature, BodyType
-from .serializers import MakeSerializer, ModelSerializer, BodyTypeSerializer, FeatureSerializer
-from .pagination import MakePagination, ModelPagination, BodyTypePagination, FeaturePagination
+from .serializers import MakeSerializer, ModelSerializer, BodyTypeSerializer, FeatureSerializer, CarSerializer
+from .pagination import MakePagination, ModelPagination, BodyTypePagination, FeaturePagination, CarPagination
 
 
 class MakeListCreateView(generics.ListCreateAPIView):
@@ -37,3 +37,8 @@ class FeatureListCreateView(generics.ListCreateAPIView):
     serializer_class = FeatureSerializer
     permission_classes = [AllowAny]
     pagination_class = FeaturePagination
+
+class CarViewSet(viewsets.ModelViewSet):
+    queryset = Car.objects.all()
+    serializer_class = CarSerializer
+    pagination_class = CarPagination
