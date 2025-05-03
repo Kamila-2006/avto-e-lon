@@ -1,15 +1,15 @@
 from rest_framework import serializers
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import UserProfile, Dealer
 
 
-class RegisterSerializer(serializers.ModelSerializer):
+User = get_user_model()
 
+class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True, validators=[validate_password])
     password_confirm = serializers.CharField(write_only=True, required=True)
-    user_type = serializers.ChoiceField(choices=UserProfile.USER_CHOICES)
     token = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -29,13 +29,12 @@ class RegisterSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         password = validated_data.pop('password')
         validated_data.pop('password_confirm')
-        user_type = validated_data.pop('user_type')
 
         user = User.objects.create(**validated_data)
         user.set_password(password)
         user.save()
 
-        UserProfile.objects.create(user=user, user_type=user_type, rating=0.0)
+        UserProfile.objects.create(user=user, rating=0.0)
 
         return user
 
@@ -46,16 +45,15 @@ class RegisterSerializer(serializers.ModelSerializer):
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['user_type', 'phone', 'avatar', 'location', 'rating', 'created_at', 'updated_at']
+        fields = ['phone', 'avatar', 'location', 'rating', 'created_at', 'updated_at']
         read_only_fields = ['created_at', 'updated_at']
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(required=False)
-    user_type = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'user_type', 'profile']
 
         extra_kwargs = {
             'id': {'read_only': True},
@@ -65,18 +63,15 @@ class UserSerializer(serializers.ModelSerializer):
             'last_name': {'required': True},
         }
 
-    def get_user_type(self, obj):
-        return obj.profile.user_type if hasattr(obj, 'profile') else None
-
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('profile', {})
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.email = validated_data.get('email', instance.email)
+        instance.user_type = validated_data.get('user_type', instance.user_type)
         instance.save()
 
         profile, created = UserProfile.objects.get_or_create(user=instance)
-        profile.user_type = profile_data.get('user_type', profile.user_type)
         profile.phone = profile_data.get('phone', profile.phone)
         profile.avatar = profile_data.get('avatar', profile.avatar)
         profile.location = profile_data.get('location', profile.location)
@@ -85,7 +80,18 @@ class UserSerializer(serializers.ModelSerializer):
 
         return instance
 
+class UserShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'first_name', 'last_name']
+
 class DealerSerializer(serializers.ModelSerializer):
+    user = UserShortSerializer(read_only=True)
+
     class Meta:
         model = Dealer
         fields = ['id', 'user', 'company_name', 'description', 'logo', 'website', 'address', 'is_verified', 'rating']
+
+    def create(self, validated_data):
+        user = self.context['request'].user
+        return Dealer.objects.create(user=user, **validated_data)

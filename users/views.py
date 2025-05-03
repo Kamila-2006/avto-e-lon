@@ -1,14 +1,17 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from rest_framework import generics
+from rest_framework import generics, viewsets
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-from rest_framework.permissions import AllowAny
-from .serializers import RegisterSerializer, UserSerializer
+from .models import Dealer
+from .serializers import RegisterSerializer, UserSerializer, DealerSerializer
+from .pagination import DealerPagination
 
+
+User = get_user_model()
 
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -30,9 +33,15 @@ class LogoutView(APIView):
             return Response({"error": "Invalid token"}, status=400)
 
 class UserProfileView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, pk):
         user = get_object_or_404(User, pk=pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
+
+class DealerViewSet(viewsets.ModelViewSet):
+    queryset = Dealer.objects.all()
+    serializer_class = DealerSerializer
+    pagination_class = DealerPagination
+    permission_classes = [IsAuthenticated]

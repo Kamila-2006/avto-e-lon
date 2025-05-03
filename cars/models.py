@@ -1,8 +1,10 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from core.base_models import BaseModel
 from listings.models import Listing
 
+
+User = get_user_model()
 
 class Make(models.Model):
     name = models.CharField(max_length=50)

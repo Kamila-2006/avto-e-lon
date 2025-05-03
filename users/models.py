@@ -1,17 +1,18 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from core.base_models import BaseModel
 
 
-class UserProfile(BaseModel):
-
+class User(AbstractUser):
     USER_CHOICES = [
         ('regular', 'Regular'),
-        ('dealer', 'Dealer')
+        ('dealer', 'Dealer'),
     ]
 
+    user_type = models.CharField(max_length=10, choices=USER_CHOICES, default='regular')
+
+class UserProfile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    user_type = models.CharField(max_length=7, choices=USER_CHOICES)
     phone = models.CharField(max_length=16)
     avatar = models.ImageField(upload_to='avatar/', null=True, blank=True)
     location = models.CharField(max_length=50)
