@@ -23,7 +23,7 @@ class Image(BaseModel):
 
 class BodyType(models.Model):
     name = models.CharField(max_length=50)
-    image = models.OneToOneField(Image, on_delete=models.CASCADE, related_name='body_type')
+    image = models.OneToOneField(Image, on_delete=models.CASCADE, related_name='body_type', null=True, blank=True)
 
 class Feature(models.Model):
     name = models.CharField(max_length=50)

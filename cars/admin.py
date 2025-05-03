@@ -1,3 +1,19 @@
 from django.contrib import admin
+from .models import Car, Make, Model, BodyType, Feature
 
-# Register your models here.
+
+@admin.register(Make)
+class MakeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'country', 'logo')
+
+@admin.register(Model)
+class ModelAdmin(admin.ModelAdmin):
+    list_display = ('id', 'make', 'name')
+
+@admin.register(BodyType)
+class BodyTypeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'image')
+
+@admin.register(Feature)
+class FeatureAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'category')
