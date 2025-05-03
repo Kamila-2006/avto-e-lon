@@ -1,5 +1,5 @@
 from rest_framework import generics, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from .models import Car, Make, Model, Feature, BodyType
 from .serializers import MakeSerializer, ModelSerializer, BodyTypeSerializer, FeatureSerializer, CarSerializer
 from .pagination import MakePagination, ModelPagination, BodyTypePagination, FeaturePagination, CarPagination
@@ -42,3 +42,9 @@ class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
     serializer_class = CarSerializer
     pagination_class = CarPagination
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [AllowAny()]
+        elif self.action in ['create', 'update', 'partial_update', 'destroy']:
+            return [IsAuthenticated()]
